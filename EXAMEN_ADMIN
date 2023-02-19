@@ -1,0 +1,206 @@
+archivo .yml
+version: '3.5'
+services:
+
+sqlserver: 
+    image: mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
+    ports:
+      - 1433:1433
+    environment:
+      - MSSQL_SA_PASSWORD=C0ntrol1*
+      - ACCEPT_EULA=
+      - MASQL_PID=Developer
+    ##docker exec -it 458 bash
+    ##volumes:
+
+  mysql:
+    image: mysql:8.0.32
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=C0ntrol1*
+  
+  postgreSQL:
+    image: postgres:15.1
+    ports:
+      - 8080:8080
+    environment:
+      POSTGRES_PASSWORD: C0ntrol1*
+      
+     CARPETA CREADA 
+      docker compose build
+      
+     SERVIDOR ARRIBA 
+      docker compose up
+      
+      
+
+use MASTER
+go
+create database SuperMercado
+go
+use SuperMercado
+go
+
+Create Table Info_CLIENTE (
+	Id_CLIENTE int primary key not null,
+	NOMBRE varchar(MAX)not null,
+	Id_TIPO int not null,
+	CEL int not null,
+);
+
+Insert Into Info_CLIENTE(Id_CLIENTE,NOMBRE,Id_TIPO,CEL)
+values(1,'Carlos Flores',1,98114016),
+       (2,'Jos� Rivera',2,97670921),
+	   (3,'Karla Flores',3,959540),
+	   (4,'Roberto Rivera',4,323011),
+	   (5,'Olga Ordo�ez',5,659874)
+	   
+Create Table Clas_CLIENTE (
+	Id_TIPO int primary key not null,
+	Tipo_CLIENTE varchar(MAX)not null,
+	Id_CLIENTE int not null,
+	foreign key (Id_CLIENTE) references Info_CLIENTE(Id_CLIENTE)
+);
+Insert into Clas_CLIENTE(Id_TIPO,Tipo_CLIENTE,Id_CLIENTE)
+values (1,'Fiel',1),
+       (2,'No Fiel',2),
+	   (3,'Fiel',3),
+	   (4,'No Fiel',4),
+	   (5,'Fiel',5)
+
+Create Table COMPRAS (
+	Id_COMPRAS int primary key not null,
+	Id_CLIENTE int not null,
+	Id_TIPO int not null,
+	Compras_R int not null,
+	foreign key (Id_CLIENTE) references Info_CLIENTE(Id_CLIENTE),
+	foreign key (Id_TIPO) references Clas_CLIENTE(Id_TIPO)
+);
+Insert into COMPRAS(Id_COMPRAS,Id_CLIENTE,Id_TIPO,Compras_R)
+values (1,01,001,100),
+       (2,02,002,200),
+	   (3,03,003,300),
+	   (4,04,004,400),
+	   (5,05,005,500)
+	  
+
+Create Table CLIENTES_CRED (
+	ID int primary key not null,
+	ID_Tipo_CLIENTE int not null,
+	Id_CLIENTE int not null,
+	SALDO int not null,
+	ABONO int not null,
+	FECHA_P date not null,
+	L_CREDITO int not null,
+	Id_COMPRAS int not null,
+	foreign key (Id_CLIENTE) references Info_CLIENTE(Id_CLIENTE),
+	foreign key (Id_COMPRAS) references COMPRAS(Id_COMPRAS)
+);
+Insert into CLIENTES_CRED(ID,ID_Tipo_CLIENTE,Id_CLIENTE,SALDO,ABONO,L_CREDITO,Id_COMPRAS)
+values (1,01,001,0001,1000,1001,0010),
+       (2,02,002,0002,2000,2002,0020),
+	   (3,03,003,0003,3000,3003,0030),
+	    (4,04,004,0004,4000,4004,0040),
+		(5,05,005,0005,5000,5005,0050)
+	   
+
+Create Table CLIENTE (
+	Id_CLIENTE int primary key not null,
+	NOMBRE varchar(MAX)not null,
+	CEL int not null,
+	Id_TIPO int not null,
+	SALDO int not null,
+	ABONO int not null,
+	FECHA_P date not null,
+	L_CREDITO int not null,
+	Id_COMPRAS int not null,
+	foreign key (Id_TIPO) references Clas_CLIENTE(Id_TIPO),
+	foreign key (Id_COMPRAS) references COMPRAS(Id_COMPRAS)
+);
+Insert into CLIENTE(Id_CLIENTE,NOMBRE,CEL,Id_TIPO,SALDO,ABONO,L_CREDITO,Id_COMPRAS)
+values (1,'Carlos Flores',1,98114016,01, 3000, 500, 30, 0001),
+       (2,'Jos� Rivera',2,97670921, 02, 5000, 300, 40, 0002),
+	   (3,'Karla Flores',3,959540, 03, 3000, 500, 50, 0004),
+	   (4,'Roberto Rivera',4,323011, 04, 4000, 500, 60, 0005)
+	  
+
+Create Table C_PROVEEDOR (
+	Id_TIPO int primary key not null,
+	TIPO varchar(MAX)not null
+);
+
+Create Table PROVEEDOR (
+	Id_PROVEEDOR int primary key not null,
+	NOMBRE varchar(MAX) not null,
+	MAIL varchar(MAX) not null,
+	NUMERO int not null,
+	Id_TIPO int not null,
+	foreign key (Id_TIPO) references C_PROVEEDOR(Id_TIPO)
+);
+
+Create Table PRODUCTO (
+	Id_PRODUCTO int primary key not null,
+	NOMBRE varchar(MAX)not null,
+	Id_PROVEEDOR int not null,
+	P_COSTO int not null,
+	P_VENTAS int not null,
+	foreign key (Id_PROVEEDOR) references PROVEEDOR(Id_PROVEEDOR)
+);
+
+Create Table PRODUCTO_T (
+	Id_TIPO int primary key not null,
+	T_PRODUCTO varchar(MAX)not null,
+	Id_PRODUCTO int not null,
+	Id_PROVEEDOR int not null,
+	foreign key (Id_PRODUCTO) references PRODUCTO(Id_PRODUCTO),
+	foreign key (Id_PROVEEDOR) references PROVEEDOR(Id_PROVEEDOR)
+);
+
+Create Table INVENTARIO (
+	ID int primary key not null,
+	Id_PRODUCTO int not null,
+	Id_PROVEEDOR int not null,
+	Id_TIPO int not null,
+	EXHIB_BODEGA int not null,
+	CANT_BODEGA int not null,
+	EXISTENCIA_T int not null,
+	foreign key (Id_PRODUCTO) references PRODUCTO(Id_PRODUCTO),
+	foreign key (Id_PROVEEDOR) references PROVEEDOR(Id_PROVEEDOR),
+	foreign key (Id_TIPO) references PRODUCTO_T(Id_TIPO)
+);
+
+Create Table CAJAS (
+	Id_CAJA int primary key not null,
+	NOMBRE varchar(MAX)not null,
+	APERT_CAJA int not null,
+	CIERRE_CAJA int not null,
+	FECHA_P date not null,
+	TOTAL_VENTAS_REALIZADAS int not null,
+	INGRESOS int not null
+);
+
+Create Table PROD_PARA_CONSUMO (
+	Id int primary key not null,
+	Id_PRODUCTO int not null,
+	PRECIO int not null,
+	CANTIDAD int not null,
+	TOTAL_PRODUCT int not null,
+	FECHA_P date not null,
+	foreign key (Id_PRODUCTO) references PRODUCTO(Id_PRODUCTO)
+);
+
+Create Table PAGO_SERVICES (
+	Id int primary key not null,
+	Tipo_SERVICE varchar(MAX)not null,
+	MES varchar(MAX)not null,
+	PAGO int not null,
+	FECHA_P date not null
+);
+
+Create Table IVA_SuperMercado (
+	Id_IMPUESTOS int primary key not null,
+	MES varchar(MAX)not null,
+	TOTAL_MONTO int not null,
+	FECHA_P date not null
+);
